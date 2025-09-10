@@ -3,6 +3,7 @@ import pytest
 import pytest_check as check
 from pages.bugs_form_page import BugsFormPage
 from data.user_data import (
+    RANDOM_VALID_USER,
     VALID_USER,
     USER_WITH_EMPTY_LAST_NAME,
     USER_WITH_EMPTY_PHONE_NUMBER,
@@ -35,24 +36,31 @@ def test_terms_and_conditions_checkbox_must_be_enabled(page: Page):
 
 def test_first_name_should_be_optional(page: Page):
     bugs_form_page = BugsFormPage(page)
-    bugs_form_page.fill_registration_form(VALID_USER)
+    user_data = RANDOM_VALID_USER
+    bugs_form_page.fill_registration_form(user_data)
     bugs_form_page.submit_form()
 
     # Intentionally using soft assertions to capture all possible bugs
-    check.is_false(bugs_form_page.is_success_message_visible())
-    check.equal(bugs_form_page.get_result_first_name().text_content(), "First Name: ")
+    check.is_true(bugs_form_page.is_success_message_visible())
     check.equal(
-        bugs_form_page.get_result_last_name().text_content(), "Last Name: Cenzon"
+        bugs_form_page.get_result_first_name().text_content(),
+        f"First Name: {user_data['first_name']}",
+    )
+    check.equal(
+        bugs_form_page.get_result_last_name().text_content(),
+        f"Last Name: {user_data['last_name']}",
     )  # This will fail due to input and output last name value mismatch
     check.equal(
         bugs_form_page.get_result_phone_number().text_content(),
-        "Phone Number: 1234567890",
+        f"Phone Number: {user_data['phone_number']}",
     )  # This will fail due to input and output phone number value mismatch
     check.equal(
-        bugs_form_page.get_result_country().text_content(), "Country: Philippines"
+        bugs_form_page.get_result_country().text_content(),
+        f"Country: {user_data['country']}",
     )
     check.equal(
-        bugs_form_page.get_result_email().text_content(), "Email: test@test.com"
+        bugs_form_page.get_result_email().text_content(),
+        f"Email: {user_data['email']}",
     )
 
 
@@ -197,7 +205,7 @@ def test_password_field_should_be_masked(page: Page):
 # Styling/Visual tests should ideally be via tools like Applitools, Percy, etc., but including them here anyway for completeness
 def test_success_message_background_color_should_be_green(page: Page):
     bugs_form_page = BugsFormPage(page)
-    bugs_form_page.fill_registration_form(VALID_USER)
+    bugs_form_page.fill_registration_form(RANDOM_VALID_USER)
     bugs_form_page.submit_form()
 
     expect(bugs_form_page.success_message).to_have_css(

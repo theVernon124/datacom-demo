@@ -1,3 +1,7 @@
+from data.data_generator import generate_user_data
+
+RANDOM_VALID_USER = generate_user_data()
+
 VALID_USER = {
     "first_name": "",
     "last_name": "Cenzon",
